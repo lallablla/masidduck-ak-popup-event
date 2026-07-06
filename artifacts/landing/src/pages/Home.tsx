@@ -92,7 +92,7 @@ export default function Home() {
           {settings.dateRange}
         </div>
         <h1 className="text-2xl font-extrabold text-foreground tracking-tight leading-snug whitespace-pre-line">
-          AK플라자 수원점{"\n"}팝업 이벤트
+          마시떡 × AK플라자 수원점{"\n"}팝업 이벤트
         </h1>
       </header>
 
