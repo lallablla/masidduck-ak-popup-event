@@ -264,16 +264,29 @@ export default function Home() {
           </section>
         )}
 
-        {/* Brand link */}
-        <div className="text-center py-2">
-          <p className="text-[11px] text-muted-foreground/60">온라인 주문은 스마트스토어에서</p>
+        {/* Brand links */}
+        <div className="flex items-center justify-center gap-6 py-2">
+          <a
+            href="https://masidduck-web.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            className="flex flex-col items-center gap-1 group"
+          >
+            <div className="w-11 h-11 rounded-2xl bg-secondary/60 flex items-center justify-center group-active:scale-95 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            </div>
+            <span className="text-[10px] text-muted-foreground/60">홈페이지</span>
+          </a>
           <a
             href="https://smartstore.naver.com/masidduck"
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-muted-foreground/70 underline underline-offset-2"
+            className="flex flex-col items-center gap-1 group"
           >
-            smartstore.naver.com/masidduck
+            <div className="w-11 h-11 rounded-2xl bg-[#03C75A]/10 flex items-center justify-center group-active:scale-95 transition-transform">
+              <SiNaver className="w-5 h-5 text-[#03C75A]" />
+            </div>
+            <span className="text-[10px] text-muted-foreground/60">스마트스토어</span>
           </a>
         </div>
 
