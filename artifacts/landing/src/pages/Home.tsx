@@ -77,12 +77,18 @@ export default function Home() {
 
   return (
     <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background shadow-2xl overflow-hidden relative pb-16">
-      <header className="px-6 pt-12 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
-        <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
+      <header className="px-6 pt-10 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
+        {/* Logos */}
+        <div className="flex items-center justify-center gap-3 mb-5">
+          <img src="/masidduck-logo.png" alt="마시떡" className="h-14 w-auto object-contain" />
+          <span className="text-xl font-light text-muted-foreground/50 select-none">×</span>
+          <img src="/ak-plaza-logo.png" alt="AK플라자" className="h-7 w-auto object-contain" />
+        </div>
+        <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
           {settings.dateRange}
         </div>
-        <h1 className="text-3xl font-extrabold text-foreground tracking-tight leading-tight mb-2 whitespace-pre-line">
-          {settings.pageTitle}
+        <h1 className="text-2xl font-extrabold text-foreground tracking-tight leading-snug whitespace-pre-line">
+          AK플라자 수원점{"\n"}팝업 이벤트
         </h1>
       </header>
 
