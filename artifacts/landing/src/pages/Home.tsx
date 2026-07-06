@@ -147,16 +147,24 @@ export default function Home() {
             </div>
 
             <div className="mb-6">
-              <div className="text-xs font-bold text-red-600 mb-2">필수 태그 (터치하여 복사)</div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-bold text-red-600">필수 태그</div>
+                <button
+                  onClick={() => copyToClipboard(settings.mainEventHashtagsRequired?.join(" ") ?? "")}
+                  className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded-lg text-xs font-bold active:scale-95 transition-transform shadow-sm"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  전체 복사
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {settings.mainEventHashtagsRequired?.map(tag => (
-                  <button 
+                  <span
                     key={tag}
-                    onClick={() => copyToClipboard(tag)}
-                    className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-semibold border border-red-100 active:scale-95 transition-transform"
+                    className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-semibold border border-red-100"
                   >
                     {tag}
-                  </button>
+                  </span>
                 ))}
               </div>
             </div>
