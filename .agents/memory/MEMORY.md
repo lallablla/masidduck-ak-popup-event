@@ -1,0 +1,1 @@
+- [ESM bundle data file path resolution](esm-bundle-path.md) — use process.cwd() not __dirname for data files; esbuild bundles resolve __dirname to dist/, not src/routes/

@@ -18,23 +18,34 @@ import { SiInstagram, SiNaver, SiKakaotalk, SiYoutube } from "react-icons/si";
 
 const DEFAULT_SETTINGS = {
   pageTitle: "마시떡 AK플라자 수원점 팝업 EVENT",
-  pageSubtitle: "QR 찍고 원하는 이벤트 하나만 참여하면 OK!",
-  heroBadge: "증정 떡 1개 무료 증정",
   dateRange: "7.10(금) - 7.23(목)",
   noticeTitle: "오늘의 공지",
-  noticeBody: "현재 이벤트 진행 중입니다.\n아래 중 하나만 참여하신 뒤 완료 화면을 직원에게 보여주세요.\n증정 떡은 현장 상황에 따라 변경되거나 조기 소진될 수 있습니다.",
-  eventStatus: "진행 중" as any,
-  highlightMessage: "현재는 카카오톡 채널추가 또는 네이버 저장·알림받기 참여를 추천드립니다.",
-  step1: "원하는 이벤트 선택",
-  step2: "팔로우/저장 참여",
-  step3: "완료 화면 직원 확인",
-  step4: "증정 떡 1개 받기",
-  fastParticipationNote: "빠른 참여를 원하시면?\n카카오톡 채널추가 또는 네이버 저장·알림받기가 가장 빠릅니다.",
-  channelOrder: ["instagram", "naver", "kakao", "youtube"],
+  noticeBody: "현재 전체 이벤트 진행 중입니다.\n인스타 인증 또는 빠른 참여 중 원하시는 이벤트에 참여해주세요.",
+  eventStatus: "전체 이벤트 진행 중" as const,
+  highlightMessage: "현재는 인스타 인증 이벤트(피자설기 증정)와 빠른 참여 이벤트를 동시 진행 중입니다.",
+  
+  mainEventActive: true,
+  mainEventBenefit: "피자설기 1개 현장 증정",
+  mainEventTitle: "인스타 인증하고\n피자설기 1개 받아가세요!",
+  mainEventDescription: "마시떡 인스타그램을 팔로우하고\n팝업 현장 사진 또는 피자설기 사진을 올려주세요.\n참여 완료 화면을 직원에게 보여주시면 피자설기 1개를 드립니다.",
+  mainEventHashtagsRequired: ["@masidduck", "#피자설기", "#AK수원팝업"],
+  mainEventHashtagsRecommended: ["#수원맛집", "#수원디저트", "#아이간식", "#쌀디저트", "#K디저트", "#이색디저트"],
+  
+  subEventActive: true,
+  subEventBenefit: "증정떡 1개",
+  subEventTitle: "빠른 참여도 OK!",
+  subEventDescription: "아래 중 하나만 참여해도 증정 혜택을 드려요.\n카카오톡 채널추가, 네이버 저장·알림받기, 유튜브 구독 중 하나를 선택하세요.",
+  
+  plusEventActive: true,
+  plusEventBenefit: "피자설기 8개입 자택 배송",
+  plusEventTitle: "PLUS EVENT — 베스트 리뷰 선정",
+  plusEventDescription: "인스타 인증 이벤트 참여자 중\n정성스러운 사진과 후기를 남겨주신 분께\n팝업 종료 후 피자설기 8개입을 보내드립니다.\n\n선정되신 분께는 팝업 종료 후 인스타그램 DM으로 개별 연락드립니다.",
+  
+  channelOrder: ["instagram", "kakao", "naver", "youtube"],
   buttons: [
-    { id: "instagram" as const, label: "인스타그램 팔로우하기", description: "마시떡 인스타그램을 팔로우하고 완료 화면을 보여주세요.", url: "https://www.instagram.com/masidduck/", visible: true },
-    { id: "naver" as const, label: "네이버 저장·알림받기", description: "마시떡 네이버 플레이스를 저장하고 소식을 받아보세요.", url: "https://map.naver.com/p/search/마시떡/place/1498829262", visible: true },
+    { id: "instagram" as const, label: "인스타그램 팔로우하기", description: "팔로우 후 현장 사진과 태그를 업로드해주세요.", url: "https://www.instagram.com/masidduck/", visible: true },
     { id: "kakao" as const, label: "카카오톡 채널추가하기", description: "마시떡 카카오톡 채널을 추가하고 완료 화면을 보여주세요.", url: "https://pf.kakao.com/_HxbfJn", visible: true },
+    { id: "naver" as const, label: "네이버 저장·알림받기", description: "마시떡 네이버 플레이스를 저장하고 소식을 받아보세요.", url: "https://map.naver.com/p/search/masidduck/place/1498829262", visible: true },
     { id: "youtube" as const, label: "유튜브 구독하기", description: "마시떡 유튜브 채널을 구독하고 완료 화면을 보여주세요.", url: "https://www.youtube.com/@마시떡", visible: true }
   ]
 };
@@ -63,7 +74,7 @@ function SortableChannelCard({ channelId, formData, setFormData }: { channelId: 
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-card p-4 rounded-xl border border-border shadow-sm flex gap-3 items-start relative mb-3">
+    <div ref={setNodeRef} style={style} className="bg-card p-4 rounded-xl border shadow-sm flex gap-3 items-start relative mb-3">
       <div {...attributes} {...listeners} className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
         <GripVertical className="w-5 h-5" />
       </div>
@@ -106,7 +117,6 @@ export function AdminPanel() {
 
   useEffect(() => {
     if (settings && isOpen && !formData) {
-      // Ensure we have buttons and channelOrder even if the old schema was used
       const safeSettings = {
         ...DEFAULT_SETTINGS,
         ...settings,
@@ -196,6 +206,9 @@ export function AdminPanel() {
     }
   };
 
+  const parseCommaSeparated = (str: string) => str.split(",").map(s => s.trim()).filter(Boolean);
+  const joinCommaSeparated = (arr: string[]) => (arr || []).join(", ");
+
   return (
     <>
       <div className="absolute bottom-6 left-0 right-0 text-center z-50">
@@ -235,7 +248,7 @@ export function AdminPanel() {
 
       <Dialog open={isOpen} onOpenChange={(open) => {
         setIsOpen(open);
-        if (!open) setFormData(null); // Reset form data on close to ensure fresh load next time
+        if (!open) setFormData(null);
       }}>
         <DialogContent className="max-w-[95%] max-h-[90vh] overflow-y-auto sm:max-w-lg rounded-2xl p-0 flex flex-col">
           <DialogHeader className="p-6 pb-2">
@@ -246,36 +259,64 @@ export function AdminPanel() {
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid grid-cols-4 mb-4">
-                  <TabsTrigger value="notice" className="text-xs">공지</TabsTrigger>
+                  <TabsTrigger value="notice" className="text-xs">공지/상태</TabsTrigger>
+                  <TabsTrigger value="events" className="text-xs">이벤트</TabsTrigger>
                   <TabsTrigger value="channels" className="text-xs">채널</TabsTrigger>
-                  <TabsTrigger value="text" className="text-xs">텍스트</TabsTrigger>
                   <TabsTrigger value="stats" className="text-xs">통계</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="notice" className="space-y-4 outline-none">
-                  <div className="grid gap-2">
-                    <Label>공지 제목</Label>
-                    <Input value={formData.noticeTitle} onChange={(e) => setFormData({...formData, noticeTitle: e.target.value})} />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>공지 본문</Label>
-                    <Textarea rows={4} value={formData.noticeBody} onChange={(e) => setFormData({...formData, noticeBody: e.target.value})} />
-                  </div>
+                  <div className="grid gap-2"><Label>페이지 제목</Label><Input value={formData.pageTitle} onChange={(e) => setFormData({...formData, pageTitle: e.target.value})} /></div>
+                  <div className="grid gap-2"><Label>날짜 범위</Label><Input value={formData.dateRange} onChange={(e) => setFormData({...formData, dateRange: e.target.value})} /></div>
                   <div className="grid gap-2">
                     <Label>진행 상태</Label>
                     <Select value={formData.eventStatus} onValueChange={(val) => setFormData({...formData, eventStatus: val})}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="진행 중">진행 중</SelectItem>
-                        <SelectItem value="일시 중단">일시 중단</SelectItem>
+                        <SelectItem value="전체 이벤트 진행 중">전체 이벤트 진행 중</SelectItem>
+                        <SelectItem value="인스타 인증 이벤트만 진행 중">인스타 인증 이벤트만 진행 중</SelectItem>
+                        <SelectItem value="빠른 참여 이벤트만 진행 중">빠른 참여 이벤트만 진행 중</SelectItem>
                         <SelectItem value="증정품 소진">증정품 소진</SelectItem>
-                        <SelectItem value="빠른 참여만 진행 중">빠른 참여만 진행 중</SelectItem>
+                        <SelectItem value="이벤트 일시 중단">이벤트 일시 중단</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid gap-2">
-                    <Label>강조 안내 문구</Label>
-                    <Input value={formData.highlightMessage} onChange={(e) => setFormData({...formData, highlightMessage: e.target.value})} />
+                  <div className="grid gap-2"><Label>공지 제목</Label><Input value={formData.noticeTitle} onChange={(e) => setFormData({...formData, noticeTitle: e.target.value})} /></div>
+                  <div className="grid gap-2"><Label>공지 본문</Label><Textarea rows={3} value={formData.noticeBody} onChange={(e) => setFormData({...formData, noticeBody: e.target.value})} /></div>
+                  <div className="grid gap-2"><Label>강조 안내 문구</Label><Input value={formData.highlightMessage} onChange={(e) => setFormData({...formData, highlightMessage: e.target.value})} /></div>
+                </TabsContent>
+
+                <TabsContent value="events" className="space-y-6 outline-none">
+                  <div className="p-4 border rounded-xl space-y-4 bg-muted/10">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-bold text-red-600">메인 이벤트 (인스타 인증)</Label>
+                      <Switch checked={formData.mainEventActive} onCheckedChange={(c) => setFormData({...formData, mainEventActive: c})} />
+                    </div>
+                    <div className="grid gap-2"><Label>혜택 배지</Label><Input value={formData.mainEventBenefit} onChange={(e) => setFormData({...formData, mainEventBenefit: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>제목</Label><Input value={formData.mainEventTitle} onChange={(e) => setFormData({...formData, mainEventTitle: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>설명</Label><Textarea rows={3} value={formData.mainEventDescription} onChange={(e) => setFormData({...formData, mainEventDescription: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>필수 해시태그 (쉼표 구분)</Label><Input value={joinCommaSeparated(formData.mainEventHashtagsRequired)} onChange={(e) => setFormData({...formData, mainEventHashtagsRequired: parseCommaSeparated(e.target.value)})} /></div>
+                    <div className="grid gap-2"><Label>추천 해시태그 (쉼표 구분)</Label><Input value={joinCommaSeparated(formData.mainEventHashtagsRecommended)} onChange={(e) => setFormData({...formData, mainEventHashtagsRecommended: parseCommaSeparated(e.target.value)})} /></div>
+                  </div>
+
+                  <div className="p-4 border rounded-xl space-y-4 bg-muted/10">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-bold text-orange-500">빠른 참여 이벤트</Label>
+                      <Switch checked={formData.subEventActive} onCheckedChange={(c) => setFormData({...formData, subEventActive: c})} />
+                    </div>
+                    <div className="grid gap-2"><Label>혜택 배지</Label><Input value={formData.subEventBenefit} onChange={(e) => setFormData({...formData, subEventBenefit: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>제목</Label><Input value={formData.subEventTitle} onChange={(e) => setFormData({...formData, subEventTitle: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>설명</Label><Textarea rows={3} value={formData.subEventDescription} onChange={(e) => setFormData({...formData, subEventDescription: e.target.value})} /></div>
+                  </div>
+
+                  <div className="p-4 border rounded-xl space-y-4 bg-muted/10">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-bold text-amber-500">베스트 리뷰 PLUS EVENT</Label>
+                      <Switch checked={formData.plusEventActive} onCheckedChange={(c) => setFormData({...formData, plusEventActive: c})} />
+                    </div>
+                    <div className="grid gap-2"><Label>혜택 배지</Label><Input value={formData.plusEventBenefit} onChange={(e) => setFormData({...formData, plusEventBenefit: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>제목</Label><Input value={formData.plusEventTitle} onChange={(e) => setFormData({...formData, plusEventTitle: e.target.value})} /></div>
+                    <div className="grid gap-2"><Label>설명</Label><Textarea rows={4} value={formData.plusEventDescription} onChange={(e) => setFormData({...formData, plusEventDescription: e.target.value})} /></div>
                   </div>
                 </TabsContent>
 
@@ -287,28 +328,6 @@ export function AdminPanel() {
                       ))}
                     </SortableContext>
                   </DndContext>
-                </TabsContent>
-
-                <TabsContent value="text" className="space-y-4 outline-none">
-                  <div className="grid gap-2"><Label>페이지 제목 (엔터로 줄바꿈)</Label><Input value={formData.pageTitle} onChange={(e) => setFormData({...formData, pageTitle: e.target.value})} /></div>
-                  <div className="grid gap-2"><Label>부제목</Label><Input value={formData.pageSubtitle} onChange={(e) => setFormData({...formData, pageSubtitle: e.target.value})} /></div>
-                  <div className="grid gap-2"><Label>히어로 뱃지</Label><Input value={formData.heroBadge} onChange={(e) => setFormData({...formData, heroBadge: e.target.value})} /></div>
-                  <div className="grid gap-2"><Label>날짜 범위</Label><Input value={formData.dateRange} onChange={(e) => setFormData({...formData, dateRange: e.target.value})} /></div>
-                  
-                  <div className="space-y-2 mt-4">
-                    <Label className="text-muted-foreground">참여 방법 (Step 1~4)</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input value={formData.step1} onChange={(e) => setFormData({...formData, step1: e.target.value})} placeholder="Step 1" />
-                      <Input value={formData.step2} onChange={(e) => setFormData({...formData, step2: e.target.value})} placeholder="Step 2" />
-                      <Input value={formData.step3} onChange={(e) => setFormData({...formData, step3: e.target.value})} placeholder="Step 3" />
-                      <Input value={formData.step4} onChange={(e) => setFormData({...formData, step4: e.target.value})} placeholder="Step 4" />
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2 mt-4">
-                    <Label>빠른 참여 배너 문구</Label>
-                    <Textarea rows={3} value={formData.fastParticipationNote} onChange={(e) => setFormData({...formData, fastParticipationNote: e.target.value})} />
-                  </div>
                 </TabsContent>
 
                 <TabsContent value="stats" className="outline-none space-y-4">

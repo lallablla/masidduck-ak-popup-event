@@ -10,18 +10,25 @@ import type { EventSettingsEventStatus } from './eventSettingsEventStatus';
 
 export interface EventSettings {
   pageTitle: string;
-  pageSubtitle: string;
-  heroBadge: string;
   dateRange: string;
   noticeTitle: string;
   noticeBody: string;
   eventStatus: EventSettingsEventStatus;
   highlightMessage: string;
-  step1: string;
-  step2: string;
-  step3: string;
-  step4: string;
-  fastParticipationNote: string;
+  mainEventActive: boolean;
+  mainEventBenefit: string;
+  mainEventTitle: string;
+  mainEventDescription: string;
+  mainEventHashtagsRequired: string[];
+  mainEventHashtagsRecommended: string[];
+  subEventActive: boolean;
+  subEventBenefit: string;
+  subEventTitle: string;
+  subEventDescription: string;
+  plusEventActive: boolean;
+  plusEventBenefit: string;
+  plusEventTitle: string;
+  plusEventDescription: string;
   channelOrder: string[];
   buttons: ChannelButton[];
 }

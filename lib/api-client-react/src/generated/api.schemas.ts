@@ -31,26 +31,34 @@ export type EventSettingsEventStatus = typeof EventSettingsEventStatus[keyof typ
 
 
 export const EventSettingsEventStatus = {
-  진행_중: '진행 중',
-  일시_중단: '일시 중단',
+  전체_이벤트_진행_중: '전체 이벤트 진행 중',
+  인스타_인증_이벤트만_진행_중: '인스타 인증 이벤트만 진행 중',
+  빠른_참여_이벤트만_진행_중: '빠른 참여 이벤트만 진행 중',
   증정품_소진: '증정품 소진',
-  빠른_참여만_진행_중: '빠른 참여만 진행 중',
+  이벤트_일시_중단: '이벤트 일시 중단',
 } as const;
 
 export interface EventSettings {
   pageTitle: string;
-  pageSubtitle: string;
-  heroBadge: string;
   dateRange: string;
   noticeTitle: string;
   noticeBody: string;
   eventStatus: EventSettingsEventStatus;
   highlightMessage: string;
-  step1: string;
-  step2: string;
-  step3: string;
-  step4: string;
-  fastParticipationNote: string;
+  mainEventActive: boolean;
+  mainEventBenefit: string;
+  mainEventTitle: string;
+  mainEventDescription: string;
+  mainEventHashtagsRequired: string[];
+  mainEventHashtagsRecommended: string[];
+  subEventActive: boolean;
+  subEventBenefit: string;
+  subEventTitle: string;
+  subEventDescription: string;
+  plusEventActive: boolean;
+  plusEventBenefit: string;
+  plusEventTitle: string;
+  plusEventDescription: string;
   channelOrder: string[];
   buttons: ChannelButton[];
 }
@@ -59,27 +67,35 @@ export type SettingsInputEventStatus = typeof SettingsInputEventStatus[keyof typ
 
 
 export const SettingsInputEventStatus = {
-  진행_중: '진행 중',
-  일시_중단: '일시 중단',
+  전체_이벤트_진행_중: '전체 이벤트 진행 중',
+  인스타_인증_이벤트만_진행_중: '인스타 인증 이벤트만 진행 중',
+  빠른_참여_이벤트만_진행_중: '빠른 참여 이벤트만 진행 중',
   증정품_소진: '증정품 소진',
-  빠른_참여만_진행_중: '빠른 참여만 진행 중',
+  이벤트_일시_중단: '이벤트 일시 중단',
 } as const;
 
 export interface SettingsInput {
   password: string;
   pageTitle: string;
-  pageSubtitle: string;
-  heroBadge: string;
   dateRange: string;
   noticeTitle: string;
   noticeBody: string;
   eventStatus: SettingsInputEventStatus;
   highlightMessage: string;
-  step1: string;
-  step2: string;
-  step3: string;
-  step4: string;
-  fastParticipationNote: string;
+  mainEventActive: boolean;
+  mainEventBenefit: string;
+  mainEventTitle: string;
+  mainEventDescription: string;
+  mainEventHashtagsRequired: string[];
+  mainEventHashtagsRecommended: string[];
+  subEventActive: boolean;
+  subEventBenefit: string;
+  subEventTitle: string;
+  subEventDescription: string;
+  plusEventActive: boolean;
+  plusEventBenefit: string;
+  plusEventTitle: string;
+  plusEventDescription: string;
   channelOrder: string[];
   buttons: ChannelButton[];
 }

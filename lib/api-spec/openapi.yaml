@@ -154,10 +154,6 @@ components:
       properties:
         pageTitle:
           type: string
-        pageSubtitle:
-          type: string
-        heroBadge:
-          type: string
         dateRange:
           type: string
         noticeTitle:
@@ -166,18 +162,45 @@ components:
           type: string
         eventStatus:
           type: string
-          enum: [진행 중, 일시 중단, 증정품 소진, 빠른 참여만 진행 중]
+          enum:
+            - 전체 이벤트 진행 중
+            - 인스타 인증 이벤트만 진행 중
+            - 빠른 참여 이벤트만 진행 중
+            - 증정품 소진
+            - 이벤트 일시 중단
         highlightMessage:
           type: string
-        step1:
+        mainEventActive:
+          type: boolean
+        mainEventBenefit:
           type: string
-        step2:
+        mainEventTitle:
           type: string
-        step3:
+        mainEventDescription:
           type: string
-        step4:
+        mainEventHashtagsRequired:
+          type: array
+          items:
+            type: string
+        mainEventHashtagsRecommended:
+          type: array
+          items:
+            type: string
+        subEventActive:
+          type: boolean
+        subEventBenefit:
           type: string
-        fastParticipationNote:
+        subEventTitle:
+          type: string
+        subEventDescription:
+          type: string
+        plusEventActive:
+          type: boolean
+        plusEventBenefit:
+          type: string
+        plusEventTitle:
+          type: string
+        plusEventDescription:
           type: string
         channelOrder:
           type: array
@@ -189,18 +212,25 @@ components:
             $ref: "#/components/schemas/ChannelButton"
       required:
         - pageTitle
-        - pageSubtitle
-        - heroBadge
         - dateRange
         - noticeTitle
         - noticeBody
         - eventStatus
         - highlightMessage
-        - step1
-        - step2
-        - step3
-        - step4
-        - fastParticipationNote
+        - mainEventActive
+        - mainEventBenefit
+        - mainEventTitle
+        - mainEventDescription
+        - mainEventHashtagsRequired
+        - mainEventHashtagsRecommended
+        - subEventActive
+        - subEventBenefit
+        - subEventTitle
+        - subEventDescription
+        - plusEventActive
+        - plusEventBenefit
+        - plusEventTitle
+        - plusEventDescription
         - channelOrder
         - buttons
     SettingsInput:
@@ -210,10 +240,6 @@ components:
           type: string
         pageTitle:
           type: string
-        pageSubtitle:
-          type: string
-        heroBadge:
-          type: string
         dateRange:
           type: string
         noticeTitle:
@@ -222,18 +248,45 @@ components:
           type: string
         eventStatus:
           type: string
-          enum: [진행 중, 일시 중단, 증정품 소진, 빠른 참여만 진행 중]
+          enum:
+            - 전체 이벤트 진행 중
+            - 인스타 인증 이벤트만 진행 중
+            - 빠른 참여 이벤트만 진행 중
+            - 증정품 소진
+            - 이벤트 일시 중단
         highlightMessage:
           type: string
-        step1:
+        mainEventActive:
+          type: boolean
+        mainEventBenefit:
           type: string
-        step2:
+        mainEventTitle:
           type: string
-        step3:
+        mainEventDescription:
           type: string
-        step4:
+        mainEventHashtagsRequired:
+          type: array
+          items:
+            type: string
+        mainEventHashtagsRecommended:
+          type: array
+          items:
+            type: string
+        subEventActive:
+          type: boolean
+        subEventBenefit:
           type: string
-        fastParticipationNote:
+        subEventTitle:
+          type: string
+        subEventDescription:
+          type: string
+        plusEventActive:
+          type: boolean
+        plusEventBenefit:
+          type: string
+        plusEventTitle:
+          type: string
+        plusEventDescription:
           type: string
         channelOrder:
           type: array
@@ -246,18 +299,25 @@ components:
       required:
         - password
         - pageTitle
-        - pageSubtitle
-        - heroBadge
         - dateRange
         - noticeTitle
         - noticeBody
         - eventStatus
         - highlightMessage
-        - step1
-        - step2
-        - step3
-        - step4
-        - fastParticipationNote
+        - mainEventActive
+        - mainEventBenefit
+        - mainEventTitle
+        - mainEventDescription
+        - mainEventHashtagsRequired
+        - mainEventHashtagsRecommended
+        - subEventActive
+        - subEventBenefit
+        - subEventTitle
+        - subEventDescription
+        - plusEventActive
+        - plusEventBenefit
+        - plusEventTitle
+        - plusEventDescription
         - channelOrder
         - buttons
     TrackEventInput:

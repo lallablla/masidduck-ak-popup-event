@@ -3,6 +3,7 @@ import { useGetSettings, useTrackEvent } from "@workspace/api-client-react";
 import { SiInstagram, SiNaver, SiKakaotalk, SiYoutube } from "react-icons/si";
 import { AdminPanel } from "@/components/AdminPanel";
 import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 type ChannelButton = {
   id: "instagram" | "naver" | "kakao" | "youtube";
@@ -23,6 +24,7 @@ export default function Home() {
   const { data: settings, isLoading } = useGetSettings();
   const trackEvent = useTrackEvent();
   const pageLoadTimeRef = useRef<number>(Date.now());
+  const { toast } = useToast();
 
   useEffect(() => {
     pageLoadTimeRef.current = Date.now();
@@ -36,130 +38,235 @@ export default function Home() {
     window.open(btn.url, "_blank", "noreferrer");
   };
 
-  const isHalted = settings?.eventStatus === "일시 중단" || settings?.eventStatus === "증정품 소진";
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "복사 완료",
+      description: `${text} 가 클립보드에 복사되었습니다.`,
+    });
+  };
+
+  if (isLoading || !settings) {
+    return (
+      <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background flex flex-col items-center justify-center space-y-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  const isAllRunning = settings.eventStatus === "전체 이벤트 진행 중";
+  const isMainOnly = settings.eventStatus === "인스타 인증 이벤트만 진행 중";
+  const isSubOnly = settings.eventStatus === "빠른 참여 이벤트만 진행 중";
+  const isHalted = settings.eventStatus === "이벤트 일시 중단" || settings.eventStatus === "증정품 소진";
+
+  const showMainEvent = !isHalted && (isAllRunning || isMainOnly) && settings.mainEventActive;
+  const showSubEvent = !isHalted && (isAllRunning || isSubOnly) && settings.subEventActive;
+  const showPlusEvent = !isHalted && (isAllRunning || isMainOnly) && settings.plusEventActive;
+
+  let noticeBadgeColor = "bg-primary text-primary-foreground";
+  if (isAllRunning) noticeBadgeColor = "bg-green-600 text-white";
+  else if (isMainOnly) noticeBadgeColor = "bg-red-600 text-white";
+  else if (isSubOnly) noticeBadgeColor = "bg-orange-500 text-white";
+  else if (isHalted) noticeBadgeColor = "bg-neutral-500 text-white";
+
+  const instagramBtn = settings.buttons.find(b => b.id === "instagram");
+  const otherBtns = (settings.channelOrder || [])
+    .filter(id => id !== "instagram")
+    .map(id => settings.buttons.find(b => b.id === id))
+    .filter(b => b && b.visible);
 
   return (
     <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background shadow-2xl overflow-hidden relative pb-16">
-      {settings ? (
-        <>
-          <header className="px-6 pt-12 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
-            <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
-              {settings.dateRange}
-            </div>
-            <h1 className="text-3xl font-extrabold text-foreground tracking-tight leading-tight mb-3 whitespace-pre-line">
-              {settings.pageTitle}
-            </h1>
-            <p className="text-muted-foreground text-sm font-medium mb-6">
-              {settings.pageSubtitle}
-            </p>
-            <div className="inline-flex items-center justify-center bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold shadow-md shadow-primary/20">
-              {settings.heroBadge}
-            </div>
-          </header>
+      <header className="px-6 pt-12 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
+        <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
+          {settings.dateRange}
+        </div>
+        <h1 className="text-3xl font-extrabold text-foreground tracking-tight leading-tight mb-2 whitespace-pre-line">
+          {settings.pageTitle}
+        </h1>
+      </header>
 
-          <main className="px-5 py-8 space-y-8">
-            {/* Notice Section */}
-            <div className="space-y-4">
-              {isHalted && (
-                <div className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-2xl text-center font-bold text-lg">
+      <main className="px-5 py-8 space-y-10">
+        {/* Notice Section */}
+        <div className="space-y-4">
+          <Card className="border-primary/10 shadow-sm overflow-hidden bg-card">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${noticeBadgeColor}`}>
                   {settings.eventStatus}
+                </span>
+                <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+                  {settings.noticeTitle}
+                </h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {settings.noticeBody}
+              </p>
+              {settings.highlightMessage && (
+                <div className="mt-4 p-3 bg-primary/5 rounded-xl text-primary text-sm font-semibold text-center">
+                  {settings.highlightMessage}
                 </div>
               )}
-              
-              <Card className="border-primary/10 shadow-sm overflow-hidden bg-card">
-                <CardContent className="p-5">
-                  <h3 className="font-bold text-lg mb-2 text-foreground flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary block"></span>
-                    {settings.noticeTitle}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {settings.noticeBody}
-                  </p>
-                  {settings.highlightMessage && (
-                    <div className="mt-4 p-3 bg-primary/5 rounded-xl text-primary text-sm font-semibold text-center">
-                      {settings.highlightMessage}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* MAIN EVENT */}
+        {showMainEvent && (
+          <section className="bg-card rounded-3xl p-6 shadow-md border-2 border-red-600/20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl">
+              인스타 인증 EVENT
+            </div>
+            
+            <div className="mt-4 mb-6 text-center">
+              <div className="inline-block bg-red-50 text-red-600 font-bold px-3 py-1 rounded-full text-xs mb-3 border border-red-100">
+                {settings.mainEventBenefit}
+              </div>
+              <h2 className="text-2xl font-black text-foreground whitespace-pre-line leading-tight">
+                {settings.mainEventTitle}
+              </h2>
+              <p className="text-sm text-muted-foreground mt-3 whitespace-pre-wrap leading-relaxed">
+                {settings.mainEventDescription}
+              </p>
             </div>
 
-            {/* Steps */}
-            <section>
-              <h2 className="text-xl font-bold mb-4 px-1 text-foreground">참여 방법</h2>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { step: 1, text: settings.step1 },
-                  { step: 2, text: settings.step2 },
-                  { step: 3, text: settings.step3 },
-                  { step: 4, text: settings.step4 },
-                ].map((s) => (
-                  <div key={s.step} className="bg-secondary/50 p-4 rounded-2xl flex flex-col items-start gap-2 border border-border/50">
-                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">STEP {s.step}</span>
-                    <span className="text-sm font-semibold text-secondary-foreground leading-snug">{s.text}</span>
-                  </div>
+            <div className="space-y-3 mb-6">
+              {[
+                "마시떡 인스타그램 팔로우하기",
+                "현장 사진 또는 피자설기 사진 업로드",
+                "아래 필수 태그 추가",
+                "완료 화면 직원에게 보여주기"
+              ].map((text, i) => (
+                <div key={i} className="flex items-center gap-3 bg-secondary/30 p-3 rounded-xl">
+                  <span className="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm font-semibold text-secondary-foreground">{text}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mb-6">
+              <div className="text-xs font-bold text-red-600 mb-2">필수 태그 (터치하여 복사)</div>
+              <div className="flex flex-wrap gap-2">
+                {settings.mainEventHashtagsRequired?.map(tag => (
+                  <button 
+                    key={tag}
+                    onClick={() => copyToClipboard(tag)}
+                    className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-semibold border border-red-100 active:scale-95 transition-transform"
+                  >
+                    {tag}
+                  </button>
                 ))}
               </div>
-            </section>
+            </div>
 
-            {/* Event Buttons */}
-            {!isHalted && settings.buttons && settings.channelOrder && (
-              <section className="space-y-4">
-                {settings.channelOrder.map((channelId) => {
-                  const btn = settings.buttons.find((b: any) => b.id === channelId);
-                  if (!btn || !btn.visible) return null;
-                  
-                  const iconData = CHANNEL_ICONS[btn.id];
-                  if (!iconData) return null;
-                  const IconComponent = iconData.icon;
-
-                  return (
-                    <a
-                      key={btn.id}
-                      href={btn.url}
-                      onClick={(e) => handleChannelClick(btn as ChannelButton, e)}
-                      data-testid={`button-${btn.id}`}
-                      className="flex items-center p-4 rounded-2xl bg-card border border-border shadow-sm transition-all active:scale-[0.98] hover:border-primary/30 group"
-                    >
-                      <div className={`w-12 h-12 rounded-xl ${iconData.bg} ${iconData.color} flex items-center justify-center shrink-0 shadow-md`}>
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <div className="ml-4 flex-1">
-                        <h4 className="font-bold text-base text-foreground mb-0.5 group-hover:text-primary transition-colors">{btn.label}</h4>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{btn.description}</p>
-                      </div>
-                    </a>
-                  );
-                })}
-              </section>
-            )}
-
-            {/* Fast Participation Banner */}
-            {settings.fastParticipationNote && (
-              <div className="bg-primary/5 rounded-2xl p-4 text-center border border-primary/10">
-                <p className="text-sm font-semibold text-primary/80 whitespace-pre-wrap">
-                  {settings.fastParticipationNote}
-                </p>
+            {settings.mainEventHashtagsRecommended?.length > 0 && (
+              <div className="mb-6">
+                <div className="text-xs font-bold text-muted-foreground mb-2">함께 달면 좋아요</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {settings.mainEventHashtagsRecommended.map(tag => (
+                    <span key={tag} className="text-xs text-muted-foreground bg-secondary/50 px-2 py-1 rounded-md">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Notes */}
-            <section className="bg-secondary/30 rounded-2xl p-5">
-              <h5 className="text-xs font-bold text-muted-foreground mb-3">유의사항</h5>
-              <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc pl-3">
-                <li>이벤트는 1인 1회 참여 가능합니다.</li>
-                <li>참여 완료 화면을 직원에게 보여주셔야 증정이 가능합니다.</li>
-                <li>증정 떡은 현장 상황에 따라 변경되거나 조기 소진될 수 있습니다.</li>
-                <li>이벤트 내용은 현장 상황에 따라 변경될 수 있습니다.</li>
-              </ul>
-            </section>
-          </main>
-        </>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
-          {isLoading && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>}
-        </div>
-      )}
+            {instagramBtn && instagramBtn.visible && (
+              <a
+                href={instagramBtn.url}
+                onClick={(e) => handleChannelClick(instagramBtn as ChannelButton, e)}
+                data-testid={`button-${instagramBtn.id}`}
+                className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white font-bold text-lg shadow-lg active:scale-[0.98] transition-all"
+              >
+                <SiInstagram className="w-6 h-6" />
+                {instagramBtn.label}
+              </a>
+            )}
+          </section>
+        )}
+
+        {/* PLUS EVENT */}
+        {showPlusEvent && (
+          <section className="bg-amber-50/50 rounded-3xl p-6 border border-amber-200/50">
+            <div className="inline-block bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
+              PLUS EVENT
+            </div>
+            <h3 className="text-lg font-bold text-amber-900 mb-2">
+              {settings.plusEventTitle}
+            </h3>
+            <div className="inline-block bg-white text-amber-600 font-bold px-2 py-1 rounded text-xs mb-3 shadow-sm">
+              {settings.plusEventBenefit}
+            </div>
+            <p className="text-sm text-amber-900/80 whitespace-pre-wrap leading-relaxed mb-4">
+              {settings.plusEventDescription}
+            </p>
+            <div className="bg-white/60 p-3 rounded-xl text-[11px] text-amber-900/70 space-y-1">
+              <div>※ 계정이 비공개인 경우 확인이 어려울 수 있습니다.</div>
+              <div>※ DM 미응답 시 선정이 취소될 수 있습니다.</div>
+              <div>※ 당첨자 선정 및 배송 안내는 팝업 종료 후 개별 연락드립니다.</div>
+            </div>
+          </section>
+        )}
+
+        {/* SUB EVENT */}
+        {showSubEvent && (
+          <section className="bg-orange-50/30 rounded-3xl p-6 border border-orange-100">
+            <div className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
+              빠른 참여 EVENT
+            </div>
+            <h3 className="text-lg font-bold text-orange-900 mb-2">
+              {settings.subEventTitle}
+            </h3>
+            <div className="inline-block bg-white text-orange-600 font-bold px-2 py-1 rounded text-xs mb-3 shadow-sm">
+              {settings.subEventBenefit}
+            </div>
+            <p className="text-sm text-orange-900/80 whitespace-pre-wrap leading-relaxed mb-5">
+              {settings.subEventDescription}
+            </p>
+            
+            <div className="space-y-3">
+              {otherBtns.map(btn => {
+                if (!btn) return null;
+                const iconData = CHANNEL_ICONS[btn.id];
+                if (!iconData) return null;
+                const IconComponent = iconData.icon;
+
+                return (
+                  <a
+                    key={btn.id}
+                    href={btn.url}
+                    onClick={(e) => handleChannelClick(btn as ChannelButton, e)}
+                    data-testid={`button-${btn.id}`}
+                    className="flex items-center p-3.5 rounded-2xl bg-white border border-orange-100 shadow-sm transition-all active:scale-[0.98] group"
+                  >
+                    <div className={`w-10 h-10 rounded-xl ${iconData.bg} ${iconData.color} flex items-center justify-center shrink-0 shadow-sm`}>
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <h4 className="font-bold text-sm text-foreground mb-0.5 group-hover:text-orange-600 transition-colors">{btn.label}</h4>
+                      <p className="text-[11px] text-muted-foreground line-clamp-1">{btn.description}</p>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Notes */}
+        <section className="bg-secondary/30 rounded-2xl p-5">
+          <h5 className="text-xs font-bold text-muted-foreground mb-3">유의사항</h5>
+          <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc pl-3">
+            <li>이벤트는 1인 1회 참여 가능합니다.</li>
+            <li>참여 완료 화면을 직원에게 보여주셔야 증정이 가능합니다.</li>
+            <li>증정품은 현장 상황에 따라 변경되거나 조기 소진될 수 있습니다.</li>
+            <li>이벤트 내용은 현장 상황에 따라 변경될 수 있습니다.</li>
+          </ul>
+        </section>
+      </main>
 
       <AdminPanel />
     </div>

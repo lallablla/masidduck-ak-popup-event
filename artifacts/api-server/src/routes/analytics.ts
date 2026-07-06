@@ -1,14 +1,10 @@
 import { Router } from "express";
 import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import { join } from "path";
 import { TrackEventBody, GetAnalyticsBody } from "@workspace/api-zod";
 import { ADMIN_PASSWORD } from "./settings";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const ANALYTICS_FILE = join(__dirname, "../../analytics.json");
+const ANALYTICS_FILE = join(process.cwd(), "analytics.json");
 
 type ChannelEntry = {
   clicks: number;
