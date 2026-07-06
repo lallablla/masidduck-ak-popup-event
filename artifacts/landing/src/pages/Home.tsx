@@ -79,13 +79,13 @@ export default function Home() {
     <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background shadow-2xl overflow-hidden relative pb-16">
       <header className="px-6 pt-10 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
         {/* Logos */}
-        <div className="flex items-center justify-center gap-3 mb-5">
-          <div className="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border border-neutral-100">
-            <img src="/masidduck-logo.png" alt="마시떡" className="w-12 h-12 object-contain" />
+        <div className="flex items-center justify-center gap-4 mb-5">
+          <div className="w-20 h-20 rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border border-neutral-100">
+            <img src="/masidduck-logo.png" alt="마시떡" className="w-16 h-16 object-contain" />
           </div>
           <span className="text-lg font-light text-muted-foreground/40 select-none">×</span>
-          <div className="w-16 h-16 rounded-full shadow-md overflow-hidden flex items-center justify-center">
-            <img src="/ak-plaza-icon.png" alt="AK플라자" className="w-full h-full object-cover" />
+          <div className="w-20 h-20 rounded-full shadow-md overflow-hidden">
+            <img src="/ak-plaza-icon.png" alt="AK플라자" className="w-full h-full object-cover scale-110" />
           </div>
         </div>
         <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
