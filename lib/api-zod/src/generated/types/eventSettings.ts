@@ -5,15 +5,23 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { ChannelButton } from './channelButton';
 import type { EventSettingsEventStatus } from './eventSettingsEventStatus';
 
 export interface EventSettings {
+  pageTitle: string;
+  pageSubtitle: string;
+  heroBadge: string;
+  dateRange: string;
   noticeTitle: string;
   noticeBody: string;
   eventStatus: EventSettingsEventStatus;
   highlightMessage: string;
-  showInstagram: boolean;
-  showNaver: boolean;
-  showKakao: boolean;
-  showYoutube: boolean;
+  step1: string;
+  step2: string;
+  step3: string;
+  step4: string;
+  fastParticipationNote: string;
+  channelOrder: string[];
+  buttons: ChannelButton[];
 }

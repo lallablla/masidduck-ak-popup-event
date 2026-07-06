@@ -20,10 +20,14 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminAuth,
+  AnalyticsData,
   ErrorResponse,
   EventSettings,
   HealthStatus,
-  SettingsInput
+  SettingsInput,
+  TrackEventInput,
+  TrackOkResponse
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -140,7 +144,7 @@ export const getGetSettingsUrl = () => {
 }
 
 /**
- * Returns the current public notice, event status, and button visibility for all visitors
+ * Returns the current settings for all visitors
  * @summary Get current event settings
  */
 export const getSettings = async ( options?: RequestInit): Promise<EventSettings> => {
@@ -278,5 +282,146 @@ export const useUpdateSettings = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getUpdateSettingsMutationOptions(options));
+    }
+
+export const getTrackEventUrl = () => {
+
+
+
+
+  return `/api/analytics/track`
+}
+
+/**
+ * @summary Track a user event (page view or button click)
+ */
+export const trackEvent = async (trackEventInput: TrackEventInput, options?: RequestInit): Promise<TrackOkResponse> => {
+
+  return customFetch<TrackOkResponse>(getTrackEventUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(trackEventInput)
+  }
+);}
+
+
+
+
+export const getTrackEventMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackEvent>>, TError,{data: BodyType<TrackEventInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackEvent>>, TError,{data: BodyType<TrackEventInput>}, TContext> => {
+
+const mutationKey = ['trackEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackEvent>>, {data: BodyType<TrackEventInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  trackEvent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackEventMutationResult = NonNullable<Awaited<ReturnType<typeof trackEvent>>>
+    export type TrackEventMutationBody = BodyType<TrackEventInput>
+    export type TrackEventMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Track a user event (page view or button click)
+ */
+export const useTrackEvent = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackEvent>>, TError,{data: BodyType<TrackEventInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof trackEvent>>,
+        TError,
+        {data: BodyType<TrackEventInput>},
+        TContext
+      > => {
+      return useMutation(getTrackEventMutationOptions(options));
+    }
+
+export const getGetAnalyticsUrl = () => {
+
+
+
+
+  return `/api/analytics`
+}
+
+/**
+ * Returns aggregated analytics data. Password validated server-side.
+ * @summary Get analytics data (admin only)
+ */
+export const getAnalytics = async (adminAuth: AdminAuth, options?: RequestInit): Promise<AnalyticsData> => {
+
+  return customFetch<AnalyticsData>(getGetAnalyticsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adminAuth)
+  }
+);}
+
+
+
+
+export const getGetAnalyticsMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAnalytics>>, TError,{data: BodyType<AdminAuth>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getAnalytics>>, TError,{data: BodyType<AdminAuth>}, TContext> => {
+
+const mutationKey = ['getAnalytics'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getAnalytics>>, {data: BodyType<AdminAuth>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  getAnalytics(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetAnalyticsMutationResult = NonNullable<Awaited<ReturnType<typeof getAnalytics>>>
+    export type GetAnalyticsMutationBody = BodyType<AdminAuth>
+    export type GetAnalyticsMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Get analytics data (admin only)
+ */
+export const useGetAnalytics = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAnalytics>>, TError,{data: BodyType<AdminAuth>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof getAnalytics>>,
+        TError,
+        {data: BodyType<AdminAuth>},
+        TContext
+      > => {
+      return useMutation(getGetAnalyticsMutationOptions(options));
     }
 

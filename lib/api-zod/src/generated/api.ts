@@ -18,18 +18,31 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * Returns the current public notice, event status, and button visibility for all visitors
+ * Returns the current settings for all visitors
  * @summary Get current event settings
  */
 export const GetSettingsResponse = zod.object({
+  "pageTitle": zod.string(),
+  "pageSubtitle": zod.string(),
+  "heroBadge": zod.string(),
+  "dateRange": zod.string(),
   "noticeTitle": zod.string(),
   "noticeBody": zod.string(),
   "eventStatus": zod.enum(['진행 중', '일시 중단', '증정품 소진', '빠른 참여만 진행 중']),
   "highlightMessage": zod.string(),
-  "showInstagram": zod.boolean(),
-  "showNaver": zod.boolean(),
-  "showKakao": zod.boolean(),
-  "showYoutube": zod.boolean()
+  "step1": zod.string(),
+  "step2": zod.string(),
+  "step3": zod.string(),
+  "step4": zod.string(),
+  "fastParticipationNote": zod.string(),
+  "channelOrder": zod.array(zod.string()),
+  "buttons": zod.array(zod.object({
+  "id": zod.enum(['instagram', 'naver', 'kakao', 'youtube']),
+  "label": zod.string(),
+  "description": zod.string(),
+  "url": zod.string(),
+  "visible": zod.boolean()
+}))
 })
 
 
@@ -39,25 +52,83 @@ export const GetSettingsResponse = zod.object({
  */
 export const UpdateSettingsBody = zod.object({
   "password": zod.string(),
+  "pageTitle": zod.string(),
+  "pageSubtitle": zod.string(),
+  "heroBadge": zod.string(),
+  "dateRange": zod.string(),
   "noticeTitle": zod.string(),
   "noticeBody": zod.string(),
   "eventStatus": zod.enum(['진행 중', '일시 중단', '증정품 소진', '빠른 참여만 진행 중']),
   "highlightMessage": zod.string(),
-  "showInstagram": zod.boolean(),
-  "showNaver": zod.boolean(),
-  "showKakao": zod.boolean(),
-  "showYoutube": zod.boolean()
+  "step1": zod.string(),
+  "step2": zod.string(),
+  "step3": zod.string(),
+  "step4": zod.string(),
+  "fastParticipationNote": zod.string(),
+  "channelOrder": zod.array(zod.string()),
+  "buttons": zod.array(zod.object({
+  "id": zod.enum(['instagram', 'naver', 'kakao', 'youtube']),
+  "label": zod.string(),
+  "description": zod.string(),
+  "url": zod.string(),
+  "visible": zod.boolean()
+}))
 })
 
 export const UpdateSettingsResponse = zod.object({
+  "pageTitle": zod.string(),
+  "pageSubtitle": zod.string(),
+  "heroBadge": zod.string(),
+  "dateRange": zod.string(),
   "noticeTitle": zod.string(),
   "noticeBody": zod.string(),
   "eventStatus": zod.enum(['진행 중', '일시 중단', '증정품 소진', '빠른 참여만 진행 중']),
   "highlightMessage": zod.string(),
-  "showInstagram": zod.boolean(),
-  "showNaver": zod.boolean(),
-  "showKakao": zod.boolean(),
-  "showYoutube": zod.boolean()
+  "step1": zod.string(),
+  "step2": zod.string(),
+  "step3": zod.string(),
+  "step4": zod.string(),
+  "fastParticipationNote": zod.string(),
+  "channelOrder": zod.array(zod.string()),
+  "buttons": zod.array(zod.object({
+  "id": zod.enum(['instagram', 'naver', 'kakao', 'youtube']),
+  "label": zod.string(),
+  "description": zod.string(),
+  "url": zod.string(),
+  "visible": zod.boolean()
+}))
+})
+
+
+/**
+ * @summary Track a user event (page view or button click)
+ */
+export const TrackEventBody = zod.object({
+  "type": zod.enum(['pageview', 'click']),
+  "channel": zod.string().nullish(),
+  "dwellMs": zod.number().nullish()
+})
+
+export const TrackEventResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * Returns aggregated analytics data. Password validated server-side.
+ * @summary Get analytics data (admin only)
+ */
+export const GetAnalyticsBody = zod.object({
+  "password": zod.string()
+})
+
+export const GetAnalyticsResponse = zod.object({
+  "pageViews": zod.number(),
+  "totalClicks": zod.number(),
+  "channelStats": zod.record(zod.string(), zod.object({
+  "clicks": zod.number(),
+  "avgDwellMs": zod.number()
+}))
 })
 
 

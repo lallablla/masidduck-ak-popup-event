@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: settings
     description: Event settings operations
+  - name: analytics
+    description: Analytics operations
 paths:
   /healthz:
     get:
@@ -31,7 +33,7 @@ paths:
       operationId: getSettings
       tags: [settings]
       summary: Get current event settings
-      description: Returns the current public notice, event status, and button visibility for all visitors
+      description: Returns the current settings for all visitors
       responses:
         "200":
           description: Current settings
@@ -69,6 +71,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /analytics/track:
+    post:
+      operationId: trackEvent
+      tags: [analytics]
+      summary: Track a user event (page view or button click)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackEventInput"
+      responses:
+        "200":
+          description: Tracked successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrackOkResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /analytics:
+    post:
+      operationId: getAnalytics
+      tags: [analytics]
+      summary: Get analytics data (admin only)
+      description: Returns aggregated analytics data. Password validated server-side.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminAuth"
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsData"
+        "401":
+          description: Invalid password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -78,9 +129,37 @@ components:
           type: string
       required:
         - status
+    ChannelButton:
+      type: object
+      properties:
+        id:
+          type: string
+          enum: [instagram, naver, kakao, youtube]
+        label:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+        visible:
+          type: boolean
+      required:
+        - id
+        - label
+        - description
+        - url
+        - visible
     EventSettings:
       type: object
       properties:
+        pageTitle:
+          type: string
+        pageSubtitle:
+          type: string
+        heroBadge:
+          type: string
+        dateRange:
+          type: string
         noticeTitle:
           type: string
         noticeBody:
@@ -90,28 +169,53 @@ components:
           enum: [진행 중, 일시 중단, 증정품 소진, 빠른 참여만 진행 중]
         highlightMessage:
           type: string
-        showInstagram:
-          type: boolean
-        showNaver:
-          type: boolean
-        showKakao:
-          type: boolean
-        showYoutube:
-          type: boolean
+        step1:
+          type: string
+        step2:
+          type: string
+        step3:
+          type: string
+        step4:
+          type: string
+        fastParticipationNote:
+          type: string
+        channelOrder:
+          type: array
+          items:
+            type: string
+        buttons:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChannelButton"
       required:
+        - pageTitle
+        - pageSubtitle
+        - heroBadge
+        - dateRange
         - noticeTitle
         - noticeBody
         - eventStatus
         - highlightMessage
-        - showInstagram
-        - showNaver
-        - showKakao
-        - showYoutube
+        - step1
+        - step2
+        - step3
+        - step4
+        - fastParticipationNote
+        - channelOrder
+        - buttons
     SettingsInput:
       type: object
       properties:
         password:
           type: string
+        pageTitle:
+          type: string
+        pageSubtitle:
+          type: string
+        heroBadge:
+          type: string
+        dateRange:
+          type: string
         noticeTitle:
           type: string
         noticeBody:
@@ -121,24 +225,94 @@ components:
           enum: [진행 중, 일시 중단, 증정품 소진, 빠른 참여만 진행 중]
         highlightMessage:
           type: string
-        showInstagram:
-          type: boolean
-        showNaver:
-          type: boolean
-        showKakao:
-          type: boolean
-        showYoutube:
-          type: boolean
+        step1:
+          type: string
+        step2:
+          type: string
+        step3:
+          type: string
+        step4:
+          type: string
+        fastParticipationNote:
+          type: string
+        channelOrder:
+          type: array
+          items:
+            type: string
+        buttons:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChannelButton"
       required:
         - password
+        - pageTitle
+        - pageSubtitle
+        - heroBadge
+        - dateRange
         - noticeTitle
         - noticeBody
         - eventStatus
         - highlightMessage
-        - showInstagram
-        - showNaver
-        - showKakao
-        - showYoutube
+        - step1
+        - step2
+        - step3
+        - step4
+        - fastParticipationNote
+        - channelOrder
+        - buttons
+    TrackEventInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [pageview, click]
+        channel:
+          type: string
+          nullable: true
+        dwellMs:
+          type: number
+          nullable: true
+      required:
+        - type
+    TrackOkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required:
+        - ok
+    AdminAuth:
+      type: object
+      properties:
+        password:
+          type: string
+      required:
+        - password
+    ChannelStats:
+      type: object
+      properties:
+        clicks:
+          type: number
+        avgDwellMs:
+          type: number
+      required:
+        - clicks
+        - avgDwellMs
+    AnalyticsData:
+      type: object
+      properties:
+        pageViews:
+          type: number
+        totalClicks:
+          type: number
+        channelStats:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ChannelStats"
+      required:
+        - pageViews
+        - totalClicks
+        - channelStats
     ErrorResponse:
       type: object
       properties:

@@ -1,65 +1,127 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useGetSettings, useUpdateSettings, getGetSettingsQueryKey } from "@workspace/api-client-react";
+import { useState, useEffect } from "react";
+import { useGetSettings, useUpdateSettings, getGetSettingsQueryKey, useGetAnalytics } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { SettingsInputEventStatus } from "@workspace/api-zod/src/generated/api";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
+import { SiInstagram, SiNaver, SiKakaotalk, SiYoutube } from "react-icons/si";
+
+const DEFAULT_SETTINGS = {
+  pageTitle: "마시떡 AK플라자 수원점 팝업 EVENT",
+  pageSubtitle: "QR 찍고 원하는 이벤트 하나만 참여하면 OK!",
+  heroBadge: "증정 떡 1개 무료 증정",
+  dateRange: "7.10(금) - 7.23(목)",
+  noticeTitle: "오늘의 공지",
+  noticeBody: "현재 이벤트 진행 중입니다.\n아래 중 하나만 참여하신 뒤 완료 화면을 직원에게 보여주세요.\n증정 떡은 현장 상황에 따라 변경되거나 조기 소진될 수 있습니다.",
+  eventStatus: "진행 중" as any,
+  highlightMessage: "현재는 카카오톡 채널추가 또는 네이버 저장·알림받기 참여를 추천드립니다.",
+  step1: "원하는 이벤트 선택",
+  step2: "팔로우/저장 참여",
+  step3: "완료 화면 직원 확인",
+  step4: "증정 떡 1개 받기",
+  fastParticipationNote: "빠른 참여를 원하시면?\n카카오톡 채널추가 또는 네이버 저장·알림받기가 가장 빠릅니다.",
+  channelOrder: ["instagram", "naver", "kakao", "youtube"],
+  buttons: [
+    { id: "instagram" as const, label: "인스타그램 팔로우하기", description: "마시떡 인스타그램을 팔로우하고 완료 화면을 보여주세요.", url: "https://www.instagram.com/masidduck/", visible: true },
+    { id: "naver" as const, label: "네이버 저장·알림받기", description: "마시떡 네이버 플레이스를 저장하고 소식을 받아보세요.", url: "https://map.naver.com/p/search/마시떡/place/1498829262", visible: true },
+    { id: "kakao" as const, label: "카카오톡 채널추가하기", description: "마시떡 카카오톡 채널을 추가하고 완료 화면을 보여주세요.", url: "https://pf.kakao.com/_HxbfJn", visible: true },
+    { id: "youtube" as const, label: "유튜브 구독하기", description: "마시떡 유튜브 채널을 구독하고 완료 화면을 보여주세요.", url: "https://www.youtube.com/@마시떡", visible: true }
+  ]
+};
+
+const CHANNEL_ICONS: Record<string, { icon: any, color: string }> = {
+  instagram: { icon: SiInstagram, color: "text-pink-500" },
+  naver: { icon: SiNaver, color: "text-[#03C75A]" },
+  kakao: { icon: SiKakaotalk, color: "text-[#FEE500]" },
+  youtube: { icon: SiYoutube, color: "text-[#FF0000]" },
+};
+
+function SortableChannelCard({ channelId, formData, setFormData }: { channelId: string, formData: any, setFormData: any }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: channelId });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+  const btn = formData.buttons.find((b: any) => b.id === channelId);
+  if (!btn) return null;
+
+  const iconData = CHANNEL_ICONS[btn.id];
+  const IconComp = iconData?.icon;
+
+  const updateBtn = (field: string, value: any) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      buttons: prev.buttons.map((b: any) => b.id === channelId ? { ...b, [field]: value } : b)
+    }));
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="bg-card p-4 rounded-xl border border-border shadow-sm flex gap-3 items-start relative mb-3">
+      <div {...attributes} {...listeners} className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
+        <GripVertical className="w-5 h-5" />
+      </div>
+      <div className="flex-1 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-sm">
+            {IconComp && <IconComp className={`w-4 h-4 ${iconData.color}`} />}
+            {btn.id.toUpperCase()}
+          </div>
+          <Switch checked={btn.visible} onCheckedChange={(c) => updateBtn("visible", c)} />
+        </div>
+        <div className="space-y-2">
+          <Input value={btn.label} onChange={(e) => updateBtn("label", e.target.value)} placeholder="버튼 라벨" className="h-8 text-sm" />
+          <Input value={btn.description} onChange={(e) => updateBtn("description", e.target.value)} placeholder="설명" className="h-8 text-sm" />
+          <Input value={btn.url} onChange={(e) => updateBtn("url", e.target.value)} placeholder="URL" className="h-8 text-xs font-mono" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function AdminPanel() {
   const [isOpen, setIsOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  
+  const [activeTab, setActiveTab] = useState("notice");
+
   const { data: settings } = useGetSettings();
   const updateSettings = useUpdateSettings();
+  const getAnalytics = useGetAnalytics();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState({
-    noticeTitle: "",
-    noticeBody: "",
-    eventStatus: "진행 중" as SettingsInputEventStatus,
-    highlightMessage: "",
-    showInstagram: true,
-    showNaver: true,
-    showKakao: true,
-    showYoutube: true,
-  });
+  const [formData, setFormData] = useState<any>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
 
   useEffect(() => {
-    if (settings && isOpen) {
-      setFormData({
-        noticeTitle: settings.noticeTitle,
-        noticeBody: settings.noticeBody,
-        eventStatus: settings.eventStatus as SettingsInputEventStatus,
-        highlightMessage: settings.highlightMessage,
-        showInstagram: settings.showInstagram,
-        showNaver: settings.showNaver,
-        showKakao: settings.showKakao,
-        showYoutube: settings.showYoutube,
-      });
+    if (settings && isOpen && !formData) {
+      // Ensure we have buttons and channelOrder even if the old schema was used
+      const safeSettings = {
+        ...DEFAULT_SETTINGS,
+        ...settings,
+        buttons: settings.buttons?.length ? settings.buttons : DEFAULT_SETTINGS.buttons,
+        channelOrder: settings.channelOrder?.length ? settings.channelOrder : DEFAULT_SETTINGS.channelOrder,
+      };
+      setFormData(safeSettings);
     }
   }, [settings, isOpen]);
+
+  useEffect(() => {
+    if (isOpen && password) {
+      getAnalytics.mutate({ data: { password } });
+    }
+  }, [isOpen, password]);
 
   const handleAdminClick = () => {
     const storedPw = sessionStorage.getItem("adminPassword");
@@ -76,7 +138,6 @@ export function AdminPanel() {
       setPasswordError("비밀번호를 입력해주세요.");
       return;
     }
-    // We will just open the panel, validation happens on save
     sessionStorage.setItem("adminPassword", password);
     setPasswordOpen(false);
     setIsOpen(true);
@@ -84,6 +145,7 @@ export function AdminPanel() {
   };
 
   const handleSave = () => {
+    if (!formData) return;
     updateSettings.mutate({
       data: {
         password: password || sessionStorage.getItem("adminPassword") || "",
@@ -106,21 +168,10 @@ export function AdminPanel() {
   };
 
   const handleReset = () => {
-    const defaultData = {
-      noticeTitle: "안내사항",
-      noticeBody: "이벤트에 참여해주셔서 감사합니다.",
-      eventStatus: "진행 중" as SettingsInputEventStatus,
-      highlightMessage: "",
-      showInstagram: true,
-      showNaver: true,
-      showKakao: true,
-      showYoutube: true,
-    };
-    
     updateSettings.mutate({
       data: {
         password: password || sessionStorage.getItem("adminPassword") || "",
-        ...defaultData
+        ...DEFAULT_SETTINGS
       }
     }, {
       onSuccess: () => {
@@ -129,22 +180,29 @@ export function AdminPanel() {
         setIsOpen(false);
       },
       onError: () => {
-        toast({ title: "저장 실패 (비밀번호 확인)", variant: "destructive" });
-        sessionStorage.removeItem("adminPassword");
-        setPassword("");
-        setIsOpen(false);
-        setPasswordOpen(true);
+        toast({ title: "저장 실패", variant: "destructive" });
       }
     });
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setFormData((prev: any) => {
+        const oldIndex = prev.channelOrder.indexOf(active.id as string);
+        const newIndex = prev.channelOrder.indexOf(over.id as string);
+        return { ...prev, channelOrder: arrayMove(prev.channelOrder, oldIndex, newIndex) };
+      });
+    }
+  };
+
   return (
     <>
-      <div className="mt-16 mb-8 text-center">
+      <div className="absolute bottom-6 left-0 right-0 text-center z-50">
         <button 
           onClick={handleAdminClick}
           data-testid="button-admin"
-          className="text-[10px] text-muted-foreground/30 hover:text-muted-foreground transition-colors"
+          className="text-[10px] text-muted-foreground/30 hover:text-muted-foreground transition-colors px-4 py-2"
         >
           관리자
         </button>
@@ -175,97 +233,135 @@ export function AdminPanel() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-[95%] max-h-[90vh] overflow-y-auto sm:max-w-lg rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>이벤트 설정 (관리자)</DialogTitle>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) setFormData(null); // Reset form data on close to ensure fresh load next time
+      }}>
+        <DialogContent className="max-w-[95%] max-h-[90vh] overflow-y-auto sm:max-w-lg rounded-2xl p-0 flex flex-col">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle>이벤트 관리</DialogTitle>
           </DialogHeader>
           
-          <div className="grid gap-6 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="noticeTitle">공지 제목</Label>
-              <Input 
-                id="noticeTitle" 
-                value={formData.noticeTitle} 
-                onChange={(e) => setFormData({...formData, noticeTitle: e.target.value})} 
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="noticeBody">공지 본문</Label>
-              <Textarea 
-                id="noticeBody" 
-                rows={4}
-                value={formData.noticeBody} 
-                onChange={(e) => setFormData({...formData, noticeBody: e.target.value})} 
-              />
-            </div>
+          {formData && (
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid grid-cols-4 mb-4">
+                  <TabsTrigger value="notice" className="text-xs">공지</TabsTrigger>
+                  <TabsTrigger value="channels" className="text-xs">채널</TabsTrigger>
+                  <TabsTrigger value="text" className="text-xs">텍스트</TabsTrigger>
+                  <TabsTrigger value="stats" className="text-xs">통계</TabsTrigger>
+                </TabsList>
 
-            <div className="grid gap-2">
-              <Label>진행 상태</Label>
-              <Select 
-                value={formData.eventStatus} 
-                onValueChange={(val: any) => setFormData({...formData, eventStatus: val})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="상태 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="진행 중">진행 중</SelectItem>
-                  <SelectItem value="일시 중단">일시 중단</SelectItem>
-                  <SelectItem value="증정품 소진">증정품 소진</SelectItem>
-                  <SelectItem value="빠른 참여만 진행 중">빠른 참여만 진행 중</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <TabsContent value="notice" className="space-y-4 outline-none">
+                  <div className="grid gap-2">
+                    <Label>공지 제목</Label>
+                    <Input value={formData.noticeTitle} onChange={(e) => setFormData({...formData, noticeTitle: e.target.value})} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>공지 본문</Label>
+                    <Textarea rows={4} value={formData.noticeBody} onChange={(e) => setFormData({...formData, noticeBody: e.target.value})} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>진행 상태</Label>
+                    <Select value={formData.eventStatus} onValueChange={(val) => setFormData({...formData, eventStatus: val})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="진행 중">진행 중</SelectItem>
+                        <SelectItem value="일시 중단">일시 중단</SelectItem>
+                        <SelectItem value="증정품 소진">증정품 소진</SelectItem>
+                        <SelectItem value="빠른 참여만 진행 중">빠른 참여만 진행 중</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>강조 안내 문구</Label>
+                    <Input value={formData.highlightMessage} onChange={(e) => setFormData({...formData, highlightMessage: e.target.value})} />
+                  </div>
+                </TabsContent>
 
-            <div className="grid gap-2">
-              <Label htmlFor="highlightMessage">강조 안내 문구</Label>
-              <Input 
-                id="highlightMessage" 
-                value={formData.highlightMessage} 
-                onChange={(e) => setFormData({...formData, highlightMessage: e.target.value})} 
-              />
-            </div>
+                <TabsContent value="channels" className="outline-none">
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={formData.channelOrder} strategy={verticalListSortingStrategy}>
+                      {formData.channelOrder.map((channelId: string) => (
+                        <SortableChannelCard key={channelId} channelId={channelId} formData={formData} setFormData={setFormData} />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                </TabsContent>
 
-            <div className="space-y-4">
-              <Label className="text-base font-semibold">버튼 노출 설정</Label>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showInsta" className="font-normal">인스타그램 팔로우</Label>
-                <Switch 
-                  id="showInsta" 
-                  checked={formData.showInstagram} 
-                  onCheckedChange={(c) => setFormData({...formData, showInstagram: c})} 
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showNaver" className="font-normal">네이버 저장·알림받기</Label>
-                <Switch 
-                  id="showNaver" 
-                  checked={formData.showNaver} 
-                  onCheckedChange={(c) => setFormData({...formData, showNaver: c})} 
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showKakao" className="font-normal">카카오톡 채널추가</Label>
-                <Switch 
-                  id="showKakao" 
-                  checked={formData.showKakao} 
-                  onCheckedChange={(c) => setFormData({...formData, showKakao: c})} 
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showYoutube" className="font-normal">유튜브 구독</Label>
-                <Switch 
-                  id="showYoutube" 
-                  checked={formData.showYoutube} 
-                  onCheckedChange={(c) => setFormData({...formData, showYoutube: c})} 
-                />
-              </div>
+                <TabsContent value="text" className="space-y-4 outline-none">
+                  <div className="grid gap-2"><Label>페이지 제목 (엔터로 줄바꿈)</Label><Input value={formData.pageTitle} onChange={(e) => setFormData({...formData, pageTitle: e.target.value})} /></div>
+                  <div className="grid gap-2"><Label>부제목</Label><Input value={formData.pageSubtitle} onChange={(e) => setFormData({...formData, pageSubtitle: e.target.value})} /></div>
+                  <div className="grid gap-2"><Label>히어로 뱃지</Label><Input value={formData.heroBadge} onChange={(e) => setFormData({...formData, heroBadge: e.target.value})} /></div>
+                  <div className="grid gap-2"><Label>날짜 범위</Label><Input value={formData.dateRange} onChange={(e) => setFormData({...formData, dateRange: e.target.value})} /></div>
+                  
+                  <div className="space-y-2 mt-4">
+                    <Label className="text-muted-foreground">참여 방법 (Step 1~4)</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input value={formData.step1} onChange={(e) => setFormData({...formData, step1: e.target.value})} placeholder="Step 1" />
+                      <Input value={formData.step2} onChange={(e) => setFormData({...formData, step2: e.target.value})} placeholder="Step 2" />
+                      <Input value={formData.step3} onChange={(e) => setFormData({...formData, step3: e.target.value})} placeholder="Step 3" />
+                      <Input value={formData.step4} onChange={(e) => setFormData({...formData, step4: e.target.value})} placeholder="Step 4" />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2 mt-4">
+                    <Label>빠른 참여 배너 문구</Label>
+                    <Textarea rows={3} value={formData.fastParticipationNote} onChange={(e) => setFormData({...formData, fastParticipationNote: e.target.value})} />
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="stats" className="outline-none space-y-4">
+                  <div className="flex justify-end mb-2">
+                    <Button variant="outline" size="sm" onClick={() => getAnalytics.mutate({ data: { password } })} disabled={getAnalytics.isPending}>
+                      새로고침
+                    </Button>
+                  </div>
+                  
+                  {getAnalytics.data ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-primary/10 p-4 rounded-xl text-center">
+                          <div className="text-xs text-muted-foreground font-semibold mb-1">총 페이지 방문</div>
+                          <div className="text-2xl font-bold text-primary">{getAnalytics.data.pageViews.toLocaleString()}</div>
+                        </div>
+                        <div className="bg-primary/10 p-4 rounded-xl text-center">
+                          <div className="text-xs text-muted-foreground font-semibold mb-1">총 버튼 클릭</div>
+                          <div className="text-2xl font-bold text-primary">{getAnalytics.data.totalClicks.toLocaleString()}</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 mt-6">
+                        <Label className="text-muted-foreground">채널별 클릭 통계</Label>
+                        {Object.entries(getAnalytics.data.channelStats).map(([ch, stat]: [string, any]) => {
+                          const iconData = CHANNEL_ICONS[ch];
+                          const IconComp = iconData?.icon;
+                          const nameMap: Record<string,string> = { instagram: "인스타그램", naver: "네이버", kakao: "카카오톡", youtube: "유튜브" };
+                          
+                          return (
+                            <div key={ch} className="bg-card border p-3 rounded-lg flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {IconComp && <IconComp className={`w-4 h-4 ${iconData.color}`} />}
+                                <span className="font-semibold text-sm">{nameMap[ch] || ch}</span>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm">
+                                <div><span className="font-bold">{stat.clicks}</span>회</div>
+                                <div className="text-muted-foreground text-xs text-right w-16">평균 {((stat.avgDwellMs || 0)/1000).toFixed(1)}초</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">통계 데이터를 불러오는 중...</div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
-          </div>
+          )}
           
-          <DialogFooter className="flex-col sm:flex-row gap-2">
+          <DialogFooter className="p-6 pt-2 flex-col sm:flex-row gap-2 border-t">
             <Button variant="outline" onClick={handleReset} data-testid="button-admin-reset" className="w-full sm:w-auto">
               기본값 복구
             </Button>

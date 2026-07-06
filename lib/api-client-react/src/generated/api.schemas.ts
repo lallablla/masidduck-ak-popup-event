@@ -9,6 +9,24 @@ export interface HealthStatus {
   status: string;
 }
 
+export type ChannelButtonId = typeof ChannelButtonId[keyof typeof ChannelButtonId];
+
+
+export const ChannelButtonId = {
+  instagram: 'instagram',
+  naver: 'naver',
+  kakao: 'kakao',
+  youtube: 'youtube',
+} as const;
+
+export interface ChannelButton {
+  id: ChannelButtonId;
+  label: string;
+  description: string;
+  url: string;
+  visible: boolean;
+}
+
 export type EventSettingsEventStatus = typeof EventSettingsEventStatus[keyof typeof EventSettingsEventStatus];
 
 
@@ -20,14 +38,21 @@ export const EventSettingsEventStatus = {
 } as const;
 
 export interface EventSettings {
+  pageTitle: string;
+  pageSubtitle: string;
+  heroBadge: string;
+  dateRange: string;
   noticeTitle: string;
   noticeBody: string;
   eventStatus: EventSettingsEventStatus;
   highlightMessage: string;
-  showInstagram: boolean;
-  showNaver: boolean;
-  showKakao: boolean;
-  showYoutube: boolean;
+  step1: string;
+  step2: string;
+  step3: string;
+  step4: string;
+  fastParticipationNote: string;
+  channelOrder: string[];
+  buttons: ChannelButton[];
 }
 
 export type SettingsInputEventStatus = typeof SettingsInputEventStatus[keyof typeof SettingsInputEventStatus];
@@ -42,14 +67,56 @@ export const SettingsInputEventStatus = {
 
 export interface SettingsInput {
   password: string;
+  pageTitle: string;
+  pageSubtitle: string;
+  heroBadge: string;
+  dateRange: string;
   noticeTitle: string;
   noticeBody: string;
   eventStatus: SettingsInputEventStatus;
   highlightMessage: string;
-  showInstagram: boolean;
-  showNaver: boolean;
-  showKakao: boolean;
-  showYoutube: boolean;
+  step1: string;
+  step2: string;
+  step3: string;
+  step4: string;
+  fastParticipationNote: string;
+  channelOrder: string[];
+  buttons: ChannelButton[];
+}
+
+export type TrackEventInputType = typeof TrackEventInputType[keyof typeof TrackEventInputType];
+
+
+export const TrackEventInputType = {
+  pageview: 'pageview',
+  click: 'click',
+} as const;
+
+export interface TrackEventInput {
+  type: TrackEventInputType;
+  channel?: string | null;
+  dwellMs?: number | null;
+}
+
+export interface TrackOkResponse {
+  ok: boolean;
+}
+
+export interface AdminAuth {
+  password: string;
+}
+
+export interface ChannelStats {
+  clicks: number;
+  avgDwellMs: number;
+}
+
+export type AnalyticsDataChannelStats = {[key: string]: ChannelStats};
+
+export interface AnalyticsData {
+  pageViews: number;
+  totalClicks: number;
+  channelStats: AnalyticsDataChannelStats;
 }
 
 export interface ErrorResponse {
