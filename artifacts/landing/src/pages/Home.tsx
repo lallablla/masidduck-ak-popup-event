@@ -264,6 +264,19 @@ export default function Home() {
           </section>
         )}
 
+        {/* Brand link */}
+        <div className="text-center py-2">
+          <p className="text-[11px] text-muted-foreground/60">온라인 주문은</p>
+          <a
+            href="https://masidduck-web.vercel.app/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-muted-foreground/70 underline underline-offset-2"
+          >
+            masidduck-web.vercel.app
+          </a>
+        </div>
+
         {/* Notes */}
         <section className="bg-secondary/30 rounded-2xl p-5">
           <h5 className="text-xs font-bold text-muted-foreground mb-3">유의사항</h5>
