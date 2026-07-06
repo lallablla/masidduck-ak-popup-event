@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: settings
+    description: Event settings operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get current event settings
+      description: Returns the current public notice, event status, and button visibility for all visitors
+      responses:
+        "200":
+          description: Current settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventSettings"
+    post:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update event settings (admin only)
+      description: Validates admin password server-side and updates the event settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsInput"
+      responses:
+        "200":
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventSettings"
+        "401":
+          description: Invalid password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +78,71 @@ components:
           type: string
       required:
         - status
-
+    EventSettings:
+      type: object
+      properties:
+        noticeTitle:
+          type: string
+        noticeBody:
+          type: string
+        eventStatus:
+          type: string
+          enum: [진행 중, 일시 중단, 증정품 소진, 빠른 참여만 진행 중]
+        highlightMessage:
+          type: string
+        showInstagram:
+          type: boolean
+        showNaver:
+          type: boolean
+        showKakao:
+          type: boolean
+        showYoutube:
+          type: boolean
+      required:
+        - noticeTitle
+        - noticeBody
+        - eventStatus
+        - highlightMessage
+        - showInstagram
+        - showNaver
+        - showKakao
+        - showYoutube
+    SettingsInput:
+      type: object
+      properties:
+        password:
+          type: string
+        noticeTitle:
+          type: string
+        noticeBody:
+          type: string
+        eventStatus:
+          type: string
+          enum: [진행 중, 일시 중단, 증정품 소진, 빠른 참여만 진행 중]
+        highlightMessage:
+          type: string
+        showInstagram:
+          type: boolean
+        showNaver:
+          type: boolean
+        showKakao:
+          type: boolean
+        showYoutube:
+          type: boolean
+      required:
+        - password
+        - noticeTitle
+        - noticeBody
+        - eventStatus
+        - highlightMessage
+        - showInstagram
+        - showNaver
+        - showKakao
+        - showYoutube
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
