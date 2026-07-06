@@ -266,14 +266,14 @@ export default function Home() {
 
         {/* Brand link */}
         <div className="text-center py-2">
-          <p className="text-[11px] text-muted-foreground/60">온라인 주문은</p>
+          <p className="text-[11px] text-muted-foreground/60">온라인 주문은 스마트스토어에서</p>
           <a
-            href="https://masidduck-web.vercel.app/"
+            href="https://smartstore.naver.com/masidduck"
             target="_blank"
             rel="noreferrer"
             className="text-xs text-muted-foreground/70 underline underline-offset-2"
           >
-            masidduck-web.vercel.app
+            smartstore.naver.com/masidduck
           </a>
         </div>
 
