@@ -80,12 +80,12 @@ export default function Home() {
       <header className="px-6 pt-10 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
         {/* Logos */}
         <div className="flex items-center justify-center gap-4 mb-5">
-          <div className="w-20 h-20 rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border border-neutral-100">
-            <img src="/masidduck-logo.png" alt="마시떡" className="w-16 h-16 object-contain" />
+          <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden border border-neutral-100">
+            <img src="/masidduck-logo.png" alt="마시떡" className="w-20 h-20 object-contain" />
           </div>
           <span className="text-lg font-light text-muted-foreground/40 select-none">×</span>
-          <div className="w-20 h-20 rounded-full shadow-md overflow-hidden">
-            <img src="/ak-plaza-icon.png" alt="AK플라자" className="w-full h-full object-cover scale-110" />
+          <div className="w-24 h-24 rounded-full shadow-lg overflow-hidden flex items-center justify-center">
+            <img src="/ak-plaza-icon.png" alt="AK플라자" className="w-full h-full object-cover scale-[1.22]" />
           </div>
         </div>
         <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
