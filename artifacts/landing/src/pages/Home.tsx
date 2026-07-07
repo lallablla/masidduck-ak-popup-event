@@ -113,7 +113,7 @@ export default function Home() {
                 {settings.noticeBody}
               </p>
               {settings.highlightMessage && (
-                <div className="mt-4 p-3 bg-primary/5 rounded-xl text-primary text-sm font-semibold text-center">
+                <div className="mt-4 p-3 bg-primary/5 rounded-xl text-primary text-sm font-semibold text-center break-keep leading-relaxed">
                   {settings.highlightMessage}
                 </div>
               )}
