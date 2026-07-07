@@ -84,8 +84,8 @@ export default function Home() {
             <img src="/masidduck-logo.png" alt="마시떡" className="w-20 h-20 object-contain" />
           </div>
           <span className="text-lg font-light text-muted-foreground/40 select-none">×</span>
-          <div className="w-24 h-24 rounded-full shadow-lg overflow-hidden flex items-center justify-center">
-            <img src="/ak-plaza-icon.png" alt="AK플라자" className="w-full h-full object-cover scale-[1.22]" />
+          <div className="w-24 h-24 rounded-full shadow-lg overflow-hidden flex items-center justify-center bg-white border border-neutral-100">
+            <img src="/ak-plaza-new.jpeg" alt="AK플라자" className="w-full h-full object-cover" />
           </div>
         </div>
         <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide">
