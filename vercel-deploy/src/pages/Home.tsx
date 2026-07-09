@@ -130,6 +130,9 @@ export default function Home() {
 
   return (
     <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background shadow-2xl overflow-hidden relative pb-16">
+      <div className="sticky top-0 z-20 bg-neutral-900 text-white text-[11px] font-medium text-center py-2 px-4 leading-relaxed">
+        💡 버튼 클릭 시 앱/새 창이 열릴 수 있어요. 이 화면으로 돌아오려면 <span className="font-bold">뒤로가기</span> 또는 <span className="font-bold">최근 앱 전환</span>을 이용해주세요.
+      </div>
       <header className="px-6 pt-10 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
         <div className="flex items-center justify-center gap-4 mb-5">
           <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden border border-neutral-100">
