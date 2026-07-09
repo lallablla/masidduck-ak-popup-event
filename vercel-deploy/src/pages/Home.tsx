@@ -94,11 +94,9 @@ export default function Home() {
     trackEvent.mutate({ data: { type: "pageview" } });
   }, []);
 
-  const handleChannelClick = (btn: ChannelButton, e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleChannelClick = (btn: ChannelButton) => {
     const dwellMs = Date.now() - pageLoadTimeRef.current;
     trackEvent.mutate({ data: { type: "click", channel: btn.id, dwellMs } });
-    window.open(btn.url, "_blank", "noreferrer");
   };
 
   const copyToClipboard = (text: string) => {
@@ -243,7 +241,9 @@ export default function Home() {
             {instagramBtn && instagramBtn.visible && (
               <a
                 href={instagramBtn.url}
-                onClick={(e) => handleChannelClick(instagramBtn as ChannelButton, e)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleChannelClick(instagramBtn as ChannelButton)}
                 className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white font-bold text-lg shadow-lg active:scale-[0.98] transition-all"
               >
                 <SiInstagram className="w-6 h-6" />
@@ -295,7 +295,9 @@ export default function Home() {
                   <a
                     key={btn.id}
                     href={btn.url}
-                    onClick={(e) => handleChannelClick(btn as ChannelButton, e)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handleChannelClick(btn as ChannelButton)}
                     className="flex items-center p-3.5 rounded-2xl bg-white border border-orange-100 shadow-sm transition-all active:scale-[0.98] group"
                   >
                     <div className={`w-10 h-10 rounded-xl ${iconData.bg} ${iconData.color} flex items-center justify-center shrink-0 shadow-sm`}>
