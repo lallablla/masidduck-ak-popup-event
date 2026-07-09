@@ -3,12 +3,18 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 export const SETTINGS_QUERY_KEY = ["settings"];
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, options);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error((err as any).error ?? `HTTP ${res.status}`);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error((err as any).error ?? `HTTP ${res.status}`);
+    }
+    return res.json();
+  } finally {
+    clearTimeout(timer);
   }
-  return res.json();
 }
 
 export function useGetSettings() {
@@ -16,6 +22,8 @@ export function useGetSettings() {
     queryKey: SETTINGS_QUERY_KEY,
     queryFn: () => apiFetch<any>("/api/settings"),
     staleTime: 30_000,
+    retry: 0,
+    refetchOnWindowFocus: false,
   });
 }
 

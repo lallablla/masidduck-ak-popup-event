@@ -82,7 +82,7 @@ const DEFAULT_SETTINGS = {
 };
 
 export default function Home() {
-  const { data: apiSettings, isLoading } = useGetSettings();
+  const { data: apiSettings } = useGetSettings();
   const trackEvent = useTrackEvent();
   const pageLoadTimeRef = useRef<number>(Date.now());
   const { toast } = useToast();
@@ -108,14 +108,6 @@ export default function Home() {
       description: `${text} 가 클립보드에 복사되었습니다.`,
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background flex flex-col items-center justify-center space-y-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   const isAllRunning = settings.eventStatus === "전체 이벤트 진행 중";
   const isMainOnly = settings.eventStatus === "인스타 인증 이벤트만 진행 중";
