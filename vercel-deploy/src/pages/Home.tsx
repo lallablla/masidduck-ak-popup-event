@@ -131,7 +131,7 @@ export default function Home() {
   return (
     <div className="min-h-[100dvh] w-full max-w-[480px] mx-auto bg-background shadow-2xl overflow-hidden relative pb-16">
       <div className="sticky top-0 z-20 bg-neutral-900 text-white text-[11px] font-medium text-center py-2 px-4 leading-relaxed">
-        💡 버튼 클릭 시 앱/새 창이 열릴 수 있어요. 이 화면으로 돌아오려면 <span className="font-bold">뒤로가기</span> 또는 <span className="font-bold">최근 앱 전환</span>을 이용해주세요.
+        💡 버튼 클릭 후 이 페이지로 돌아오려면 화면의 <span className="font-bold">뒤로가기(←)</span> 버튼을 눌러주세요.
       </div>
       <header className="px-6 pt-10 pb-8 text-center bg-card rounded-b-[2.5rem] shadow-sm relative z-10">
         <div className="flex items-center justify-center gap-4 mb-5">
@@ -244,8 +244,7 @@ export default function Home() {
             {instagramBtn && instagramBtn.visible && (
               <a
                 href={instagramBtn.url}
-                target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 onClick={() => handleChannelClick(instagramBtn as ChannelButton)}
                 className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white font-bold text-lg shadow-lg active:scale-[0.98] transition-all"
               >
@@ -298,8 +297,7 @@ export default function Home() {
                   <a
                     key={btn.id}
                     href={btn.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener"
                     onClick={() => handleChannelClick(btn as ChannelButton)}
                     className="flex items-center p-3.5 rounded-2xl bg-white border border-orange-100 shadow-sm transition-all active:scale-[0.98] group"
                   >
@@ -318,13 +316,13 @@ export default function Home() {
         )}
 
         <div className="flex items-center justify-center gap-6 py-2">
-          <a href="https://masidduck-web.vercel.app/" target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 group">
+          <a href="https://masidduck-web.vercel.app/" rel="noopener" className="flex flex-col items-center gap-1 group">
             <div className="w-11 h-11 rounded-2xl bg-secondary/60 flex items-center justify-center group-active:scale-95 transition-transform">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
             </div>
             <span className="text-[10px] text-muted-foreground/60">홈페이지</span>
           </a>
-          <a href="https://smartstore.naver.com/masidduck" target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 group">
+          <a href="https://smartstore.naver.com/masidduck" rel="noopener" className="flex flex-col items-center gap-1 group">
             <div className="w-11 h-11 rounded-2xl bg-[#03C75A]/10 flex items-center justify-center group-active:scale-95 transition-transform">
               <SiNaver className="w-5 h-5 text-[#03C75A]" />
             </div>
