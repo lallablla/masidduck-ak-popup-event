@@ -164,12 +164,17 @@ export function AdminPanel() {
         queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
         setIsOpen(false);
       },
-      onError: () => {
-        toast({ title: "저장 실패 (비밀번호 확인)", variant: "destructive" });
-        sessionStorage.removeItem("adminPassword");
-        setPassword("");
-        setIsOpen(false);
-        setPasswordOpen(true);
+      onError: (err: any) => {
+        const msg = err?.message ?? "";
+        if (msg.includes("401") || msg.includes("비밀번호")) {
+          toast({ title: "저장 실패 (비밀번호 확인)", variant: "destructive" });
+          sessionStorage.removeItem("adminPassword");
+          setPassword("");
+          setIsOpen(false);
+          setPasswordOpen(true);
+        } else {
+          toast({ title: `저장 실패: ${msg || "서버 오류"}`, variant: "destructive" });
+        }
       }
     });
   };
