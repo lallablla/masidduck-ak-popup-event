@@ -2,6 +2,7 @@ import { Redis } from "@upstash/redis";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const REDIS_KEY = "masidduck:settings";
+const SETTINGS_VERSION = 2;
 const ADMIN_PASSWORD = process.env["ADMIN_PASSWORD"] ?? "0710";
 
 const DEFAULT_SETTINGS = {
@@ -90,8 +91,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
     try {
       const redis = getRedis();
-      const stored = await redis.get<object>(REDIS_KEY);
-      res.json({ ...DEFAULT_SETTINGS, ...(stored ?? {}) });
+      const stored = await redis.get<any>(REDIS_KEY);
+      if (!stored || (stored._version ?? 0) < SETTINGS_VERSION) {
+        const fresh = { ...DEFAULT_SETTINGS, _version: SETTINGS_VERSION };
+        await redis.set(REDIS_KEY, fresh);
+        res.json(fresh);
+      } else {
+        res.json({ ...DEFAULT_SETTINGS, ...stored });
+      }
     } catch {
       res.json(DEFAULT_SETTINGS);
     }
@@ -110,7 +117,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const redis = getRedis();
       const stored = await redis.get<object>(REDIS_KEY);
-      const newSettings = { ...DEFAULT_SETTINGS, ...(stored ?? {}), ...rest };
+      const newSettings = { ...DEFAULT_SETTINGS, ...(stored ?? {}), ...rest, _version: SETTINGS_VERSION };
       await redis.set(REDIS_KEY, newSettings);
       res.json(newSettings);
     } catch (e: any) {
