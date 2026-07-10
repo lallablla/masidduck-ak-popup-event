@@ -99,7 +99,7 @@ export function AdminPanel() {
   const [passwordError, setPasswordError] = useState("");
   const [activeTab, setActiveTab] = useState("notice");
 
-  const { data: settings } = useGetSettings();
+  const { data: settings, refetch: refetchSettings, isError: settingsError } = useGetSettings();
   const updateSettings = useUpdateSettings();
   const getAnalytics = useGetAnalytics();
   const queryClient = useQueryClient();
@@ -112,16 +112,23 @@ export function AdminPanel() {
   );
 
   useEffect(() => {
-    if (settings && isOpen && !formData) {
+    if (isOpen && !formData) {
+      const base = settings ?? {};
       const safeSettings = {
         ...DEFAULT_SETTINGS,
-        ...settings,
-        buttons: settings.buttons?.length ? settings.buttons : DEFAULT_SETTINGS.buttons,
-        channelOrder: settings.channelOrder?.length ? settings.channelOrder : DEFAULT_SETTINGS.channelOrder,
+        ...base,
+        buttons: base.buttons?.length ? base.buttons : DEFAULT_SETTINGS.buttons,
+        channelOrder: base.channelOrder?.length ? base.channelOrder : DEFAULT_SETTINGS.channelOrder,
       };
       setFormData(safeSettings);
     }
-  }, [settings, isOpen]);
+  }, [settings, isOpen, formData]);
+
+  useEffect(() => {
+    if (isOpen) {
+      refetchSettings();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && password) {
@@ -226,6 +233,11 @@ export function AdminPanel() {
         <DialogContent className="max-w-[95%] max-h-[90vh] overflow-y-auto sm:max-w-lg rounded-2xl p-0 flex flex-col">
           <DialogHeader className="p-6 pb-2"><DialogTitle>이벤트 관리</DialogTitle></DialogHeader>
 
+          {settingsError && (
+            <div className="mx-6 mb-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              서버에서 최신 설정을 불러오지 못해 기본값을 표시하고 있어요. 저장 전 내용을 확인해주세요.
+            </div>
+          )}
           {formData && (
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
