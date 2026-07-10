@@ -317,7 +317,14 @@ export function AdminPanel() {
                       새로고침
                     </Button>
                   </div>
-                  {getAnalytics.data ? (
+                  {getAnalytics.isError ? (
+                    <div className="text-center py-8 space-y-3">
+                      <p className="text-sm text-destructive">통계를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>
+                      <Button variant="outline" size="sm" onClick={() => getAnalytics.mutate({ data: { password } })}>
+                        다시 시도
+                      </Button>
+                    </div>
+                  ) : getAnalytics.data ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="bg-primary/10 p-4 rounded-xl text-center">
