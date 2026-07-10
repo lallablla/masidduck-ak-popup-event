@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS = {
   noticeTitle: "오늘의 공지",
   noticeBody: "현재 전체 이벤트 진행 중입니다.\n인스타 인증 또는 빠른 참여 중 원하시는 이벤트에 참여해주세요.",
   eventStatus: "전체 이벤트 진행 중" as const,
-  highlightMessage: "현재는 인스타 인증 이벤트(약과 증정)와 빠른 참여 이벤트를 동시 진행 중입니다.",
+  highlightMessage: "현재는 인스타 인증 이벤트와\n빠른 참여 이벤트를(약과증정) 동시 진행 중입니다.",
   mainEventActive: true,
   mainEventBenefit: "둘이 먹다 하나가 없어져도 모를 약과 1개 현장 증정!",
   mainEventTitle: "인스타 인증하고\n약과 1개 받아가세요!",
