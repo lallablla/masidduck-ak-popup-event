@@ -87,7 +87,15 @@ export default function Home() {
   const pageLoadTimeRef = useRef<number>(Date.now());
   const { toast } = useToast();
 
-  const settings = apiSettings ?? DEFAULT_SETTINGS;
+  const rawSettings = apiSettings ?? DEFAULT_SETTINGS;
+  const settings = {
+    ...rawSettings,
+    subEventBenefit: DEFAULT_SETTINGS.subEventBenefit,
+    mainEventBenefit: DEFAULT_SETTINGS.mainEventBenefit,
+    mainEventTitle: DEFAULT_SETTINGS.mainEventTitle,
+    mainEventDescription: DEFAULT_SETTINGS.mainEventDescription,
+    highlightMessage: DEFAULT_SETTINGS.highlightMessage,
+  };
 
   useEffect(() => {
     pageLoadTimeRef.current = Date.now();
