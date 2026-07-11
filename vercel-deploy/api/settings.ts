@@ -92,13 +92,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const redis = getRedis();
       const stored = await redis.get<any>(REDIS_KEY);
-      if (!stored || (stored._version ?? 0) < SETTINGS_VERSION) {
-        const fresh = { ...DEFAULT_SETTINGS, _version: SETTINGS_VERSION };
-        await redis.set(REDIS_KEY, fresh);
-        res.json(fresh);
-      } else {
-        res.json({ ...DEFAULT_SETTINGS, ...stored });
+      const merged = { ...DEFAULT_SETTINGS, ...(stored ?? {}) };
+      merged.subEventBenefit = DEFAULT_SETTINGS.subEventBenefit;
+      merged.mainEventBenefit = DEFAULT_SETTINGS.mainEventBenefit;
+      merged.mainEventTitle = DEFAULT_SETTINGS.mainEventTitle;
+      merged.mainEventDescription = DEFAULT_SETTINGS.mainEventDescription;
+      merged.highlightMessage = DEFAULT_SETTINGS.highlightMessage;
+      if ((stored?._version ?? 0) < SETTINGS_VERSION) {
+        await redis.set(REDIS_KEY, { ...merged, _version: SETTINGS_VERSION }).catch(() => {});
       }
+      res.json(merged);
     } catch {
       res.json(DEFAULT_SETTINGS);
     }
