@@ -2,7 +2,7 @@ import { Redis } from "@upstash/redis";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const REDIS_KEY = "masidduck:settings";
-const SETTINGS_VERSION = 2;
+const SETTINGS_VERSION = 3;
 const ADMIN_PASSWORD = process.env["ADMIN_PASSWORD"] ?? "0710";
 
 const DEFAULT_SETTINGS = {
